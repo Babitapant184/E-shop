@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Shop with Me</title>
+<style>
+  /* Reset & basics */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f6f8;
+    color: #333;
+    min-height: 100vh;
+    /* Use system font scaling */
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  #app {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 0 12px #ccc;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  header {
+    background: #007bff;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+    background: #f9fbfd;
+  }
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-weight: 600;
+  }
+  button:hover:not(:disabled) {
+    background: #0056b3;
+  }
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    transition: border-color 0.3s ease;
+  }
+  input:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  label {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  a {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  a:hover {
+    color: #0056b3;
+  }
+  .small-text {
+    font-size: 0.9rem;
+    margin-top: -10px;
+    margin-bottom: 16px;
+    color: #666;
+  }
+  .error {
+    color: #cc0000;
+    margin-bottom: 16px;
+  }
+  .success {
+    color: #007b00;
+    margin-bottom: 16px;
+  }
+  /* Login/Register form container */
+  #login-register > div {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  /* Forms */
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  /* Product list */
+  .product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 18px;
+  }
+  .product-item {
+    background: #fafafa;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+  }
+  .product-item:hover {
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.12);
+  }
+  .product-item img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+    margin-bottom: 14px;
+    user-select: none;
+  }
+  .product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .product-name {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: #222;
+  }
+  .product-desc {
+    font-size: 0.9rem;
+    color: #555;
+    height: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+  }
+  .product-price {
+    color: #bf5700;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .btn-small {
+    padding: 8px 14px;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+  /* Cart */
+  #cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .cart-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    background: #fafafa;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.05);
+  }
+  .cart-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+    user-select: none;
+  }
+  .cart-info {
+    flex: 1;
+    min-width: 150px;
+  }
+  .cart-info > div {
+    margin-bottom: 6px;
+  }
+  .cart-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-width: 160px;
+  }
+  .cart-actions input[type=number] {
+    width: 60px;
+    padding: 8px 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  /* Nav tabs */
+  #customer-nav, #admin-nav {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid #ddd;
+    background: #f7f9fc;
+    flex-shrink: 0;
+  }
+  #customer-nav button, #admin-nav button {
+    flex-grow: 1;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    padding: 14px 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
+  #customer-nav button.active, #admin-nav button.active {
+    background: #007bff;
+    color: white;
+  }
+  /* Order list */
+  .order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .order-item {
+    background: #fafafa;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.07);
+  }
+  .order-header {
+    font-weight: 800;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+  .order-status {
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 8px;
+    color: white;
+    display: inline-block;
+    font-size: 0.95rem;
+    user-select: none;
+  }
+  .status-pending { background: #ff9f00; }
+  .status-shipped { background: #007bff; }
+  .status-delivered { background: #28a745; }
+  .status-canceled { background: #dc3545; }
+  /* Table for orders (admin) */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+  }
+  th, td {
+    padding: 12px 14px;
+    border: 1.5px solid #ddd;
+    text-align: left;
+  }
+  th {
+    background: #f0f0f0;
+    font-weight: 700;
+  }
+  select.status-select {
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  /* Scrollbar for list */
+  main::-webkit-scrollbar {
+    width: 8px;
+  }
+  main::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  main::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  main::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+  }
+  /* Responsive fonts and layout */
+
+  /* Desktop and larger tablets */
+  @media (min-width: 992px) {
+    #app {
+      height: 90vh;
+      margin-top: 2vh;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    main {
+      padding: 24px 40px;
+    }
+  }
+
+  /* Medium tablets and small laptops */
+  @media (min-width: 600px) and (max-width: 991px) {
+    main {
+      padding: 20px 28px;
+    }
+    .product-item {
+      grid-column-end: span 1 !important;
+    }
+  }
+
+  /* Mobile phones */
+  @media (max-width: 599px) {
+    #app {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    header {
+      font-size: 1.4rem;
+      padding: 10px 15px;
+    }
+    main {
+      padding: 12px 16px;
+    }
+    .product-item {
+      grid-template-columns: 1fr !important;
+      padding: 12px 14px;
+    }
+    .product-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+    .product-list {
+      grid-template-columns: 1fr !important;
+      gap: 14px;
+    }
+    button {
+      font-size: 1rem;
+      padding: 10px 16px;
+    }
+    /* Navigation buttons smaller */
+    #customer-nav button, #admin-nav button {
+      font-size: 1rem;
+      padding: 12px 0;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app" role="main" aria-label="Shop with Me application">
+  <header id="header" tabindex="0">Shop with Me</header>
+  <main id="main-content" tabindex="0" aria-live="polite" aria-atomic="true">
+    <!-- Content loads here -->
+  </main>
+
+  <!-- Navigation for customer/admin -->
+  <nav id="customer-nav" style="display:none;" aria-label="Customer section navigation">
+    <button id="nav-shop" class="active" aria-current="page" aria-label="Shop products">Shop</button>
+    <button id="nav-cart" aria-label="View cart">Cart</button>
+    <button id="nav-orders" aria-label="View your orders">Orders</button>
+    <button id="nav-profile" aria-label="View and edit your profile">Profile</button>
+    <button id="btn-logout-cust" style="color:#dc3545;" aria-label="Logout from customer account">Logout</button>
+  </nav>
+  <nav id="admin-nav" style="display:none;" aria-label="Admin section navigation">
+    <button id="nav-products" class="active" aria-current="page" aria-label="Manage products">Products</button>
+    <button id="nav-orders-admin" aria-label="Manage orders">Orders</button>
+    <button id="nav-customers" aria-label="Manage customers">Customers</button>
+    <button id="btn-logout-admin" style="color:#dc3545;" aria-label="Logout from admin account">Logout</button>
+  </nav>
+</div>
+<script>
+(() => {
+  // Constants
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'admin123';
+  const USD_TO_INR = 75; // Static conversion rate used
+
+  // DOM References
+  const header = document.getElementById('header');
+  const mainContent = document.getElementById('main-content');
+  const customerNav = document.getElementById('customer-nav');
+  const adminNav = document.getElementById('admin-nav');
+
+  // State
+  let currentUser = null; // null or {name, username, isAdmin:boolean}
+  let currentView = null; // string representing current tab
+  let cart = []; // array of {productId, quantity}
+
+  // Storage keys
+  const USERS_KEY = 'swm_users';
+  const PRODUCTS_KEY = 'swm_products';
+  const ORDERS_KEY = 'swm_orders';
+
+  // Initial setup: load from localStorage or init default
+  function loadData(key, defaultValue) {
+    try {
+      const val = localStorage.getItem(key);
+      return val ? JSON.parse(val) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  }
+  function saveData(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  // Initialize data sets
+  let users = loadData(USERS_KEY, []);
+  let products = loadData(PRODUCTS_KEY, []);
+  let orders = loadData(ORDERS_KEY, []);
+
+  // Generate initial products if empty
+  if(products.length === 0) {
+    products = [
+      {id: 'p1', name: 'Blue Sneakers', description: 'Comfortable blue sneakers for everyday wear.', price: 49.99, image: 'https://images.unsplash.com/photo-1600185364964-896bfac0a889?auto=format&fit=crop&w=80&q=80'},
+      {id: 'p2', name: 'Red Backpack', description: 'Stylish red backpack perfect for travel and school.', price: 59.50, image: 'https://images.unsplash.com/photo-1508898578281-774ac4893a2b?auto=format&fit=crop&w=80&q=80'},
+      {id: 'p3', name: 'Wireless Headphones', description: 'Noise-cancelling wireless headphones for immersive sound.', price: 89.90, image: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=80&q=80'},
+      {id: 'p4', name: 'Smart Watch', description: 'Keep track of your health and notifications with this smart watch.', price: 120.00, image: 'https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=80&q=80'},
+      {id: 'p5', name: 'Elegant Watch', description: 'Classic elegant watch suitable for all occasions.', price: 130.00, image:'https://images.unsplash.com/photo-1516035069371-29a1ab93c582?auto=format&fit=crop&w=80&q=80'}
+    ];
+    saveData(PRODUCTS_KEY, products);
+  }
+
+  // HTML Helper
+  function escapeHtml(text) {
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  // Show error/success messages
+  function showMessage(container, text, type = 'error') {
+    const div = document.createElement('div');
+    div.className = type === 'error' ? 'error' : 'success';
+    div.textContent = text;
+    container.prepend(div);
+    setTimeout(() => {
+      div.remove();
+    }, 4000);
+  }
+
+  // Save all data after changes
+  function saveAll() {
+    saveData(USERS_KEY, users);
+    saveData(PRODUCTS_KEY, products);
+    saveData(ORDERS_KEY, orders);
+  }
+
+  // Authentication Functions
+  function tryLogin(username, password) {
+    if(username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      currentUser = {name: 'Administrator', username: username, isAdmin: true};
+      cart = [];
+      renderApp();
+      return true;
+    }
+    const user = users.find(u => u.username === username);
+    if(user && user.password === password) {
+      currentUser = {name: user.name, username: user.username, isAdmin: false};
+      loadCart();
+      renderApp();
+      return true;
+    }
+    return false;
+  }
+  function logout() {
+    currentUser = null;
+    cart = [];
+    currentView = null;
+    renderLoginPage();
+  }
+
+  // Register new customer user
+  function registerUser(name, username, password) {
+    username = username.trim();
+    if(users.find(u => u.username === username) || username === ADMIN_USERNAME) return false;
+    users.push({name, username, password});
+    saveData(USERS_KEY, users);
+    return true;
+  }
+
+  // Cart Functions
+  function loadCart() {
+    if(currentUser && !currentUser.isAdmin){
+      const storedCart = loadData('swm_cart_' + currentUser.username, []);
+      cart = storedCart;
+    } else {
+      cart = [];
+    }
+  }
+  function saveCart() {
+    if(currentUser && !currentUser.isAdmin) {
+      saveData('swm_cart_' + currentUser.username, cart);
+    }
+  }
+  function addToCart(productId, qty=1) {
+    let existing = cart.find(item => item.productId === productId);
+    if(existing){
+      existing.quantity += qty;
+    } else {
+      cart.push({productId, quantity: qty});
+    }
+    if(cart.find(c => c.quantity <= 0)){
+      cart = cart.filter(c => c.quantity > 0);
+    } 
+    saveCart();
+  }
+  function updateCartItem(productId, quantity) {
+    const item = cart.find(i => i.productId === productId);
+    if(item){
+      item.quantity = quantity;
+      if(item.quantity <= 0){
+        cart = cart.filter(i => i.productId !== productId);
+      }
+      saveCart();
+    }
+  }
+  function removeCartItem(productId) {
+    cart = cart.filter(i => i.productId !== productId);
+    saveCart();
+  }
+  function clearCart() {
+    cart = [];
+    saveCart();
+  }
+
+  // Order Functions
+  function placeOrder(shippingInfo, paymentMethod) {
+    const now = new Date();
+    const orderId = 'O' + now.getTime();
+    const orderItems = cart.map(ci => {
+      const prod = products.find(p => p.id === ci.productId);
+      return {
+        productId: ci.productId,
+        name: prod ? prod.name : 'Unknown',
+        price: prod ? prod.price : 0,
+        quantity: ci.quantity
+      };
+    });
+    const total = orderItems.reduce((sum,i) => sum + i.price*i.quantity, 0);
+    const newOrder = {
+      id: orderId,
+      customerUsername: currentUser.username,
+      customerName: currentUser.name,
+      date: now.toISOString(),
+      items: orderItems,
+      total: total,
+      shippingInfo: {...shippingInfo},
+      paymentMethod: paymentMethod,
+      status: 'pending' // pending, shipped, delivered, canceled
+    };
+    orders.push(newOrder);
+    saveData(ORDERS_KEY, orders);
+    clearCart();
+    return newOrder;
+  }
+  function getUserOrders(username) {
+    return orders.filter(o => o.customerUsername === username);
+  }
+  function updateOrderStatus(orderId, status) {
+    const order = orders.find(o => o.id === orderId);
+    if(order) {
+      order.status = status;
+      saveData(ORDERS_KEY, orders);
+      return true;
+    }
+    return false;
+  }
+
+  // Admin Functions
+  function addProduct(product) {
+    product.id = 'p' + (Math.random()*1000000|0);
+    products.push(product);
+    saveData(PRODUCTS_KEY, products);
+  }
+  function updateProduct(productId, updated) {
+    const prod = products.find(p => p.id === productId);
+    if(prod){
+      Object.assign(prod, updated);
+      saveData(PRODUCTS_KEY, products);
+      return true;
+    }
+    return false;
+  }
+  function deleteProduct(productId) {
+    products = products.filter(p => p.id !== productId);
+    saveData(PRODUCTS_KEY, products);
+    // Remove from carts as well
+    Object.keys(localStorage).forEach(k => {
+      if(k.startsWith('swm_cart_')){
+        let c = loadData(k, []);
+        c = c.filter(ci => ci.productId !== productId);
+        localStorage.setItem(k, JSON.stringify(c));
+      }
+    });
+  }
+  function getCustomers() {
+    return users;
+  }
+  function deleteCustomer(username) {
+    users = users.filter(u => u.username !== username);
+    saveData(USERS_KEY, users);
+    // Remove user's orders and cart
+    orders = orders.filter(o => o.customerUsername !== username);
+    saveData(ORDERS_KEY, orders);
+    localStorage.removeItem('swm_cart_' + username);
+  }
+  function updateUser(username, updated) {
+    const user = users.find(u => u.username === username);
+    if(user){
+      Object.assign(user, updated);
+      saveData(USERS_KEY, users);
+      return true;
+    }
+    return false;
+  }
+
+  // UI Rendering functions
+
+  // Login and Register page
+  function renderLoginPage() {
+    header.textContent = 'Shop with Me - Login/Register';
+    customerNav.style.display = 'none';
+    adminNav.style.display = 'none';
+    mainContent.innerHTML = `
+      <div id="login-register" role="region" aria-label="Login and Registration forms">
+
+        <div id="login-section">
+          <h2 style="text-align:center;">Login</h2>
+          <form id="login-form" autocomplete="off" aria-describedby="login-desc">
+            <div id="login-desc" class="small-text">Enter your username and password to login.</div>
+            <label for="login-username">Username</label>
+            <input id="login-username" type="text" required autocomplete="username" aria-required="true"/>
+
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" required autocomplete="current-password" aria-required="true"/>
+
+            <button type="submit" aria-label="Login to your account">Login</button>
+          </form>
+          <p class="small-text" style="text-align:center;">
+            Don't have an account? <a id="show-register" role="button" tabindex="0">Register here</a>
+          </p>
+        </div>
+
+        <div id="register-section" style="display:none;">
+          <h2 style="text-align:center;">Register</h2>
+          <form id="register-form" autocomplete="off" aria-describedby="register-desc">
+            <div id="register-desc" class="small-text">Fill in your details to create a new customer account.</div>
+            <label for="reg-name">Name</label>
+            <input id="reg-name" type="text" required autocomplete="name" aria-required="true"/>
+
+            <label for="reg-username">Username</label>
+            <input id="reg-username" type="text" required autocomplete="username" aria-required="true"/>
+
+            <label for="reg-password">Password</label>
+            <input id="reg-password" type="password" required autocomplete="new-password" aria-required="true"/>
+
+            <button type="submit" aria-label="Register new account">Register</button>
+          </form>
+          <p class="small-text" style="text-align:center;">
+            Already have an account? <a id="show-login" role="button" tabindex="0">Login here</a>
+          </p>
+        </div>
+
+      </div>
+    `;
+
+    // Event listeners
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const showRegisterLink = document.getElementById('show-register');
+    const showLoginLink = document.getElementById('show-login');
+    const loginSection = document.getElementById('login-section');
+    const registerSection = document.getElementById('register-section');
+
+    showRegisterLink.onclick = () => {
+      loginSection.style.display = 'none';
+      registerSection.style.display = 'block';
+      registerSection.querySelector('input').focus();
+    };
+    showRegisterLink.onkeydown = e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showRegisterLink.onclick();
+      }
+    };
+    showLoginLink.onclick = () => {
+      loginSection.style.display = 'block';
+      registerSection.style.display = 'none';
+      loginSection.querySelector('input').focus();
+    };
+    showLoginLink.onkeydown = e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showLoginLink.onclick();
+      }
+    };
+    loginForm.onsubmit = (e) => {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      if(!tryLogin(username, password)) {
+        showMessage(loginForm, 'Invalid username or password.', 'error');
+      }
+    };
+    registerForm.onsubmit = (e) => {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      if(username.toLowerCase() === ADMIN_USERNAME.toLowerCase()){
+        showMessage(registerForm, 'This username is reserved.', 'error');
+        return;
+      }
+      if(!registerUser(name, username, password)){
+        showMessage(registerForm, 'Username already exists.', 'error');
+        return;
+      }
+      showMessage(registerForm, 'Registration successful! You can login now.', 'success');
+      setTimeout(() => {
+        registerSection.style.display = 'none';
+        loginSection.style.display = 'block';
+      }, 2000);
+    };
+  }
+
+  // Customer Interface
+
+  // Render customer navigation tabs
+  function renderCustomerNav(active) {
+    customerNav.style.display = 'flex';
+    adminNav.style.display = 'none';
+    ['nav-shop','nav-cart','nav-orders','nav-profile'].forEach(id => {
+      const btn = document.getElementById(id);
+      btn.classList.remove('active');
+      btn.removeAttribute('aria-current');
+    });
+    if(active) {
+      const btn = document.getElementById(active);
+      btn.classList.add('active');
+      btn.setAttribute('aria-current', 'page');
+    }
+  }
+
+  // Helper to convert price USD to INR string with ₹
+  function toINR(usdPrice) {
+    const inr = usdPrice * USD_TO_INR;
+    return `₹${inr.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  }
+
+  // Render product shop page
+  function renderShopPage() {
+    currentView = 'nav-shop';
+    header.textContent = `Shop with Me - Shop`;
+    renderCustomerNav('nav-shop');
+    mainContent.innerHTML = `
+      <input type="text" id="search-products" placeholder="Search products" aria-label="Search products" />
+      <div class="product-list" id="product-list"></div>
+    `;
+    const productList = document.getElementById('product-list');
+    const searchInput = document.getElementById('search-products');
+
+    function displayProducts(filter='') {
+      let filterLower = filter.toLowerCase();
+      const filtered = products.filter(p => p.name.toLowerCase().includes(filterLower) || p.description.toLowerCase().includes(filterLower));
+      productList.innerHTML = '';
+      if(filtered.length === 0) {
+        productList.innerHTML = '<p style="text-align:center;">No products found.</p>';
+        return;
+      }
+      filtered.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'product-item';
+        div.innerHTML = `
+          <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" />
+          <div class="product-info">
+            <div class="product-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+            <div class="product-desc" title="${escapeHtml(p.description)}">${escapeHtml(p.description)}</div>
+            <div class="product-price">${toINR(p.price)}</div>
+          </div>
+          <button class="btn-small" aria-label="Add ${escapeHtml(p.name)} to cart">Add to Cart</button>
+        `;
+        const btn = div.querySelector('button');
+        btn.onclick = () => {
+          addToCart(p.id, 1);
+          showMessage(mainContent, `${p.name} added to cart.`, 'success');
+        };
+        productList.appendChild(div);
+      });
+    }
+    displayProducts();
+
+    searchInput.oninput = (e) => {
+      displayProducts(e.target.value);
+    };
+  }
+
+  // Render Cart page
+  function renderCartPage() {
+    currentView = 'nav-cart';
+    header.textContent = 'Shop with Me - Cart';
+    renderCustomerNav('nav-cart');
+    mainContent.innerHTML = '<div id="cart-items"></div><div id="cart-summary" style="margin-top:16px;"></div>';
+
+    const cartItemsDiv = document.getElementById('cart-items');
+    const cartSummaryDiv = document.getElementById('cart-summary');
+
+    function displayCart(){
+      if(cart.length === 0){
+        cartItemsDiv.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
+        cartSummaryDiv.innerHTML = '';
+        return;
+      }
+      cartItemsDiv.innerHTML = '';
+      cart.forEach(ci => {
+        const p = products.find(p => p.id === ci.productId);
+        if(!p) return;
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" />
+          <div class="cart-info">
+            <div class="product-name">${escapeHtml(p.name)}</div>
+            <div>Price: ${toINR(p.price)}</div>
+          </div>
+          <div class="cart-actions" role="group" aria-label="Modify cart item quantity and removal">
+            <label for="qty-${p.id}" class="small-text" style="min-width:32px;">Qty</label>
+            <input type="number" id="qty-${p.id}" min="1" max="999" value="${ci.quantity}" aria-live="polite" />
+            <button class="btn-small" aria-label="Remove item ${escapeHtml(p.name)} from cart">Remove</button>
+          </div>
+        `;
+        const qtyInput = div.querySelector('input[type=number]');
+        const removeBtn = div.querySelector('button');
+
+        qtyInput.onchange = (e) => {
+          let val = parseInt(e.target.value);
+          if(isNaN(val) || val < 1) val = 1;
+          updateCartItem(ci.productId, val);
+          displayCart();
+        };
+        removeBtn.onclick = () => {
+          removeCartItem(ci.productId);
+          displayCart();
+        };
+        cartItemsDiv.appendChild(div);
+      });
+
+      // Summary + checkout
+      const total = cart.reduce((sum,ci) => {
+        const p = products.find(p => p.id === ci.productId);
+        return sum + (p ? p.price*ci.quantity : 0);
+      }, 0);
+      cartSummaryDiv.innerHTML = `
+        <strong>Total: ${toINR(total)}</strong>
+        <button id="btn-checkout" style="margin-top: 16px; width: 100%;">Proceed to Checkout</button>
+      `;
+
+      document.getElementById('btn-checkout').onclick = () => {
+        renderCheckoutPage();
+      };
+    }
+
+    displayCart();
+  }
+
+  // Render Checkout page with payment options (including cash on delivery)
+  function renderCheckoutPage() {
+    currentView = 'checkout';
+    header.textContent = 'Shop with Me - Checkout';
+    renderCustomerNav(null);
+    mainContent.innerHTML = `
+      <h3>Shipping Information</h3>
+      <form id="checkout-form" autocomplete="off" aria-describedby="checkout-desc">
+        <div id="checkout-desc" class="small-text">Enter your shipping details and select payment method.</div>
+        <label for="ship-name">Full Name</label>
+        <input id="ship-name" type="text" required value="${escapeHtml(currentUser.name)}" aria-required="true"/>
+
+        <label for="ship-address">Address</label>
+        <input id="ship-address" type="text" required aria-required="true"/>
+
+        <label for="ship-city">City</label>
+        <input id="ship-city" type="text" required aria-required="true"/>
+
+        <label for="ship-zip">ZIP / Postal Code</label>
+        <input id="ship-zip" type="text" required aria-required="true"/>
+
+        <label for="ship-country">Country</label>
+        <input id="ship-country" type="text" required aria-required="true"/>
+        
+        <fieldset style="border: 1px solid #ccc; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+          <legend style="font-weight:700; padding: 0 6px;">Payment Method</legend>
+          <div>
+            <input type="radio" id="payment-cod" name="payment-method" value="Cash on Delivery" checked />
+            <label for="payment-cod">Cash on Delivery</label>
+          </div>
+          <div style="opacity: 0.6; user-select: none; margin-top: 8px;">
+            <input type="radio" id="payment-card" name="payment-method" value="Card Payment" disabled />
+            <label for="payment-card">Card Payment (coming soon)</label>
+          </div>
+        </fieldset>
+
+        <button type="submit" aria-label="Place your order">Place Order</button>
+      </form>
+      <button id="btn-cancel-checkout" style="margin-top:12px; background:#6c757d;">Cancel</button>
+    `;
+    const form = document.getElementById('checkout-form');
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      if(cart.length === 0){
+        alert('Your cart is empty.');
+        renderCartPage();
+        return;
+      }
+      const shippingInfo = {
+        name: form['ship-name'].value.trim(),
+        address: form['ship-address'].value.trim(),
+        city: form['ship-city'].value.trim(),
+        zip: form['ship-zip'].value.trim(),
+        country: form['ship-country'].value.trim(),
+      };
+      if(Object.values(shippingInfo).some(v => v === '')){
+        alert('Please fill all shipping details.');
+        return;
+      }
+      const paymentMethod = form['payment-method'].value;
+      placeOrder(shippingInfo, paymentMethod);
+      showMessage(mainContent, 'Order placed successfully!', 'success');
+      setTimeout(() => {
+        renderOrdersPage();
+      }, 1700);
+    };
+    document.getElementById('btn-cancel-checkout').onclick = () => {
+      renderCartPage();
+    };
+  }
+
+  // Render customer orders page
+  function renderOrdersPage() {
+    currentView = 'nav-orders';
+    header.textContent = 'Shop with Me - Your Orders';
+    renderCustomerNav('nav-orders');
+
+    const userOrders = getUserOrders(currentUser.username);
+
+    if(userOrders.length === 0){
+      mainContent.innerHTML = '<p style="text-align:center; margin-top:20px;">You have no orders yet.</p>';
+      return;
+    }
+    mainContent.innerHTML = '<div class="order-list"></div>';
+    const orderList = mainContent.querySelector('.order-list');
+
+    userOrders.forEach(o => {
+      const d = document.createElement('div');
+      d.className = 'order-item';
+      d.innerHTML = `
+        <div class="order-header">Order ID: ${o.id}</div>
+        <div>Date: ${new Date(o.date).toLocaleString()}</div>
+        <div>Status: <span class="order-status status-${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span></div>
+        <div>Payment: <strong>${escapeHtml(o.paymentMethod)}</strong></div>
+        <div>Items:</div>
+        <ul>
+          ${o.items.map(it => `<li>${escapeHtml(it.name)} ×${it.quantity} - ${toINR(it.price*it.quantity)}</li>`).join('')}
+        </ul>
+        <div><strong>Total: ${toINR(o.total)}</strong></div>
+        <details>
+          <summary>Shipping Details</summary>
+          <p>
+            Name: ${escapeHtml(o.shippingInfo.name)}<br />
+            Address: ${escapeHtml(o.shippingInfo.address)}<br />
+            City: ${escapeHtml(o.shippingInfo.city)}<br />
+            ZIP: ${escapeHtml(o.shippingInfo.zip)}<br />
+            Country: ${escapeHtml(o.shippingInfo.country)}
+          </p>
+        </details>
+      `;
+      orderList.appendChild(d);
+    });
+  }
+
+  // Render customer profile page
+  function renderProfilePage() {
+    currentView = 'nav-profile';
+    header.textContent = 'Shop with Me - Profile';
+    renderCustomerNav('nav-profile');
+    mainContent.innerHTML = `
+    <form id="profile-form" autocomplete="off" aria-describedby="profile-desc">
+    <div id="profile-desc" class="small-text">Update your name or password below.</div>
+      <label for="profile-name">Name</label>
+      <input id="profile-name" type="text" required value="${escapeHtml(currentUser.name)}" aria-required="true" />
+      <label for="profile-password">Change Password (leave blank to keep current)</label>
+      <input id="profile-password" type="password" aria-required="false"/>
+      <button type="submit" aria-label="Save profile changes">Save Profile</button>
+    </form>
+    `;
+    const form = document.getElementById('profile-form');
+    form.onsubmit = e => {
+      e.preventDefault();
+      const newName = form['profile-name'].value.trim();
+      const newPass = form['profile-password'].value;
+      if(newName.length === 0){
+        showMessage(form, 'Name cannot be empty.', 'error');
+        return;
+      }
+      // Update user info
+      let userObj = users.find(u => u.username === currentUser.username);
+      if(userObj) {
+        userObj.name = newName;
+        if(newPass.length > 0) {
+          userObj.password = newPass;
+        }
+        saveData(USERS_KEY, users);
+        currentUser.name = newName;
+        showMessage(form, 'Profile updated successfully.', 'success');
+      }
+    };
+  }
+
+  // Admin Interface
+
+  // Render admin navigation tabs
+  function renderAdminNav(active) {
+    customerNav.style.display = 'none';
+    adminNav.style.display = 'flex';
+    ['nav-products','nav-orders-admin','nav-customers'].forEach(id => {
+      const btn = document.getElementById(id);
+      btn.classList.remove('active');
+      btn.removeAttribute('aria-current');
+    });
+    if(active) {
+      const btn = document.getElementById(active);
+      btn.classList.add('active');
+      btn.setAttribute('aria-current', 'page');
+    }
+  }
+
+  // Render admin products management
+  function renderAdminProducts() {
+    currentView = 'nav-products';
+    header.textContent = 'Shop with Me - Manage Products';
+    renderAdminNav('nav-products');
+    mainContent.innerHTML = `
+      <button id="btn-add-product" style="margin-bottom:16px;">Add New Product</button>
+      <div id="admin-product-list"></div>
+    `;
+    const productListDiv = document.getElementById('admin-product-list');
+
+    function renderProducts(){
+      if(products.length === 0){
+        productListDiv.innerHTML = '<p style="text-align:center;">No products available.</p>';
+        return;
+      }
+      productListDiv.innerHTML = '';
+      products.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'product-item';
+        div.innerHTML = `
+          <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" />
+          <div class="product-info">
+            <div class="product-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+            <div class="product-desc" title="${escapeHtml(p.description)}">${escapeHtml(p.description)}</div>
+            <div class="product-price">${toINR(p.price)}</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top: 8px;">
+            <button class="btn-small btn-edit">Edit</button>
+            <button class="btn-small btn-delete" style="background:#dc3545;">Delete</button>
+          </div>
+        `;
+        // Edit button
+        div.querySelector('.btn-edit').onclick = () => {
+          renderAdminProductEdit(p);
+        };
+        // Delete button
+        div.querySelector('.btn-delete').onclick = () => {
+          if(confirm(`Delete product "${p.name}"?`)){
+            deleteProduct(p.id);
+            renderProducts();
+          }
+        };
+        productListDiv.appendChild(div);
+      });
+    }
+    renderProducts();
+
+    document.getElementById('btn-add-product').onclick = () => {
+      renderAdminProductEdit(null);
+    };
+  }
+
+  // Render admin add/edit product page
+  function renderAdminProductEdit(product) {
+    currentView = 'edit-product';
+    header.textContent = product ? `Edit Product - ${product.name}` : 'Add New Product';
+    renderAdminNav(null);
+    mainContent.innerHTML = `
+      <form id="product-form" autocomplete="off" aria-describedby="prod-desc">
+      <div id="prod-desc" class="small-text">${product ? `Edit details of product ${escapeHtml(product.name)}.` : 'Fill details to add a new product.'}</div>
+        <label for="prod-name">Name</label>
+        <input id="prod-name" type="text" required value="${product ? escapeHtml(product.name) : ''}" aria-required="true" />
+        <label for="prod-description">Description</label>
+        <input id="prod-description" type="text" required value="${product ? escapeHtml(product.description) : ''}" aria-required="true" />
+        <label for="prod-price">Price (INR ₹)</label>
+        <input id="prod-price" type="number" min="0" step="0.01" required value="${product ? (product.price*USD_TO_INR).toFixed(2) : ''}" aria-required="true" />
+        <label for="prod-image">Image URL</label>
+        <input id="prod-image" type="file" accept="image/*" required aria-required="true" />
+        <button type="submit">${product ? 'Save Changes' : 'Add Product'}</button>
+      </form>
+      <button id="btn-cancel-edit" style="margin-top:16px; background:#6c757d;">Cancel</button>
+    `;
+   const input = document.getElementById('prod-image');
+    const preview = document.getElementById('image-preview');
+
+     input.addEventListener('change', () => {
+     const file = input.files[0];
+     if (file) {
+     const reader = new FileReader();
+     reader.onload = e => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+});
+
+    const form = document.getElementById('product-form');
+    form.onsubmit = e => {
+      e.preventDefault();
+      const name = form['prod-name'].value.trim();
+      const description = form['prod-description'].value.trim();
+      const priceINR = parseFloat(form['prod-price'].value);
+      const price = priceINR / USD_TO_INR; // store in USD internally
+      const image = form['prod-image'].value.trim();
+      if(!name || !description || isNaN(price) || price < 0 || !image) {
+        alert('Please fill all fields with valid values.');
+        return;
+      }
+      if(product){
+        updateProduct(product.id, {name, description, price, image});
+        showMessage(mainContent, 'Product updated successfully.', 'success');
+      } else {
+        addProduct({name, description, price, image});
+        showMessage(mainContent, 'Product added successfully.', 'success');
+      }
+      setTimeout(() => {
+        renderAdminProducts();
+      }, 1500);
+    };
+    document.getElementById('btn-cancel-edit').onclick = () => {
+      renderAdminProducts();
+    };
+  }
+
+  // Render admin orders management
+  function renderAdminOrders() {
+    currentView = 'nav-orders-admin';
+    header.textContent = 'Shop with Me - Manage Orders';
+    renderAdminNav('nav-orders-admin');
+
+    if(orders.length === 0){
+      mainContent.innerHTML = '<p style="text-align:center; margin-top:20px;">No orders found.</p>';
+      return;
+    }
+    mainContent.innerHTML = `
+      <table aria-label="Orders Table" tabindex="0">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Change Status</th>
+          </tr>
+        </thead>
+        <tbody id="orders-table-body"></tbody>
+      </table>
+    `;
+
+    const tbody = document.getElementById('orders-table-body');
+    tbody.innerHTML = '';
+    orders.forEach(o => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${o.id}</td>
+        <td>${escapeHtml(o.customerName)} (${escapeHtml(o.customerUsername)})</td>
+        <td>${new Date(o.date).toLocaleString()}</td>
+        <td>${toINR(o.total)}</td>
+        <td>${escapeHtml(o.paymentMethod)}</td>
+        <td><span class="order-status status-${o.status}">${o.status.charAt(0).toUpperCase() + o.status.slice(1)}</span></td>
+        <td>
+          <select class="status-select" aria-label="Change order status">
+            <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>Pending</option>
+            <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+            <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+            <option value="canceled" ${o.status === 'canceled' ? 'selected' : ''}>Canceled</option>
+          </select>
+        </td>
+      `;
+      const select = tr.querySelector('select');
+      select.onchange = e => {
+        const newStatus = e.target.value;
+        updateOrderStatus(o.id, newStatus);
+        renderAdminOrders();
+        showMessage(mainContent, `Order ${o.id} status updated to ${newStatus}.`, 'success');
+      };
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Render admin customer management
+  function renderAdminCustomers() {
+    currentView = 'nav-customers';
+    header.textContent = 'Shop with Me - Manage Customers';
+    renderAdminNav('nav-customers');
+    const custs = getCustomers();
+
+    if(custs.length === 0){
+      mainContent.innerHTML = '<p style="text-align:center; margin-top:20px;">No customers found.</p>';
+      return;
+    }
+    mainContent.innerHTML = `
+      <table aria-label="Customer List" tabindex="0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customers-table-body"></tbody>
+      </table>
+    `;
+    const tbody = document.getElementById('customers-table-body');
+    tbody.innerHTML = '';
+
+    custs.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(c.name)}</td>
+        <td>${escapeHtml(c.username)}</td>
+        <td>
+          <button class="btn-small btn-edit">Edit</button>
+          <button class="btn-small btn-delete" style="background:#dc3545;">Delete</button>
+        </td>
+      `;
+      // Edit button
+      tr.querySelector('.btn-edit').onclick = () => {
+        renderAdminCustomerEdit(c);
+      };
+      // Delete button
+      tr.querySelector('.btn-delete').onclick = () => {
+        if(confirm(`Delete customer "${c.username}" and all their orders?`)){
+          deleteCustomer(c.username);
+          renderAdminCustomers();
+        }
+      };
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Render admin edit customer page
+  function renderAdminCustomerEdit(customer) {
+    currentView = 'edit-customer';
+    header.textContent = `Edit Customer: ${customer.username}`;
+    renderAdminNav(null);
+    mainContent.innerHTML = `
+      <form id="customer-edit-form" autocomplete="off" aria-describedby="cust-edit-desc">
+      <div id="cust-edit-desc" class="small-text">
+        Update the customer's name or password.
+      </div>
+        <label for="cust-name">Name</label>
+        <input id="cust-name" type="text" required value="${escapeHtml(customer.name)}" aria-required="true" />
+        <label for="cust-password">Change Password (leave blank to keep current)</label>
+        <input id="cust-password" type="password" aria-required="false"/>
+        <button type="submit">Save Changes</button>
+      </form>
+      <button id="btn-cancel-cust-edit" style="margin-top:16px; background:#6c757d;">Cancel</button>
+    `;
+    const form = document.getElementById('customer-edit-form');
+    form.onsubmit = e => {
+      e.preventDefault();
+      const newName = form['cust-name'].value.trim();
+      const newPass = form['cust-password'].value;
+      if(newName === ''){
+        showMessage(form, 'Name cannot be empty.', 'error');
+        return;
+      }
+      let updated = {name: newName};
+      if(newPass.length > 0) updated.password = newPass;
+      updateUser(customer.username, updated);
+      showMessage(form, 'Customer updated successfully.', 'success');
+    };
+    document.getElementById('btn-cancel-cust-edit').onclick = () => {
+      renderAdminCustomers();
+    };
+  }
+
+  // Main render
+  function renderApp() {
+    if(!currentUser){
+      renderLoginPage();
+      return;
+    }
+    if(currentUser.isAdmin){
+      renderAdminProducts();
+      adminNav.style.display = 'flex';
+      customerNav.style.display = 'none';
+    } else {
+      renderShopPage();
+      customerNav.style.display = 'flex';
+      adminNav.style.display = 'none';
+    }
+  }
+
+  // Nav button event bindings
+  document.body.addEventListener('click', e => {
+    if(e.target.matches('#nav-shop')){
+      renderShopPage();
+    } else if(e.target.matches('#nav-cart')){
+      renderCartPage();
+    } else if(e.target.matches('#nav-orders')){
+      renderOrdersPage();
+    } else if(e.target.matches('#nav-profile')){
+      renderProfilePage();
+    } else if(e.target.matches('#btn-logout-cust')){
+      if(confirm('Are you sure you want to logout?')){
+        logout();
+      }
+    } else if(e.target.matches('#nav-products')){
+      renderAdminProducts();
+    } else if(e.target.matches('#nav-orders-admin')){
+      renderAdminOrders();
+    } else if(e.target.matches('#nav-customers')){
+      renderAdminCustomers();
+    } else if(e.target.matches('#btn-logout-admin')){
+      if(confirm('Are you sure you want to logout?')){
+        logout();
+      }
+    }
+  });
+
+  // Start app
+  renderApp();
+})();
+</script>
+</body>
+</html>
+
